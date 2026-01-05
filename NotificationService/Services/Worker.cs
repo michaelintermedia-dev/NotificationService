@@ -1,4 +1,4 @@
-namespace NotificationService
+namespace NotificationService.Services
 {
     public class Worker(ILogger<Worker> logger, IKafkaConsumer kafkaConsumer) : BackgroundService
     {

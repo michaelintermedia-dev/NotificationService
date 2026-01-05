@@ -1,6 +1,6 @@
 using Confluent.Kafka;
 
-namespace NotificationService
+namespace NotificationService.Services
 {
     public interface IKafkaConsumer
     {

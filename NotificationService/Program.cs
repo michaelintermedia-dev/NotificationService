@@ -1,4 +1,4 @@
-using NotificationService;
+using NotificationService.Services;
 
 var builder = Host.CreateApplicationBuilder(args);
 
