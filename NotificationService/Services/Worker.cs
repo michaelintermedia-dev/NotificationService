@@ -8,8 +8,25 @@ namespace NotificationService.Services
             
             try
             {
-                // Consume from your Kafka topic
-                await kafkaConsumer.ConsumeAsync("audio.analyze.completed", stoppingToken);
+                var topics = new[] { "user.registered", "audio.analyze.completed", "user.deregistered" };
+                
+                await Task.WhenAll(topics.Select(topic =>
+                    Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await kafkaConsumer.ConsumeAsync(topic, stoppingToken);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            logger.LogInformation("Consumer for topic {topic} stopped", topic);
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(ex, "Consumer for topic {topic} encountered an error", topic);
+                            throw;
+                        }
+                    }, stoppingToken)));
             }
             catch (OperationCanceledException)
             {

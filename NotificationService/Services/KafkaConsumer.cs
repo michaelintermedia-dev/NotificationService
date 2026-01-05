@@ -7,7 +7,10 @@ namespace NotificationService.Services
         Task ConsumeAsync(string topic, CancellationToken cancellationToken);
     }
 
-    public class KafkaConsumer(ILogger<KafkaConsumer> logger, IConfiguration configuration) : IKafkaConsumer
+    public class KafkaConsumer(
+        ILogger<KafkaConsumer> logger,
+        IConfiguration configuration,
+        IMessageDispatcher messageDispatcher) : IKafkaConsumer
     {
         public async Task ConsumeAsync(string topic, CancellationToken cancellationToken)
         {
@@ -50,8 +53,7 @@ namespace NotificationService.Services
                                 consumeResult.Offset,
                                 consumeResult.Message.Value);
 
-                            // Process your message here
-                            await ProcessMessageAsync(consumeResult.Message.Value, cancellationToken);
+                            await ProcessMessageAsync(consumeResult.Topic, consumeResult.Message.Value, cancellationToken);
                         }
                         catch (ConsumeException ex)
                         {
@@ -67,11 +69,9 @@ namespace NotificationService.Services
             }
         }
 
-        private async Task ProcessMessageAsync(string message, CancellationToken cancellationToken)
+        private async Task ProcessMessageAsync(string topic, string message, CancellationToken cancellationToken)
         {
-            // TODO: Implement your business logic here
-            // This method is called for each message consumed from Kafka
-            await Task.CompletedTask;
+            await messageDispatcher.DispatchAsync(topic, message, cancellationToken);
         }
     }
 }
