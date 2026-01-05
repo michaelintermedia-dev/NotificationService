@@ -135,17 +135,65 @@ namespace NotificationService.Services
         {
             try
             {
-                var userId = JsonSerializer.Deserialize<JsonElement>(message)
-                    .GetProperty("userId")
-                    .GetString();
-
-                if (string.IsNullOrEmpty(userId))
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                
+                using var doc = JsonDocument.Parse(message);
+                var root = doc.RootElement;
+                
+                if (!root.TryGetProperty("userId", out var userIdElement) || userIdElement.ValueKind == JsonValueKind.Null)
                 {
-                    logger.LogWarning("Failed to extract userId from user deregistered event");
+                    logger.LogWarning("User deregistered event has no userId");
                     return;
                 }
 
-                logger.LogInformation("User deregistered: {userId}", userId);
+                var userId = userIdElement.GetString();
+                if (string.IsNullOrEmpty(userId))
+                {
+                    logger.LogWarning("User deregistered event has empty userId");
+                    return;
+                }
+
+                var deviceTokens = new List<string>();
+                if (root.TryGetProperty("deviceTokens", out var tokensElement) && tokensElement.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var token in tokensElement.EnumerateArray())
+                    {
+                        if (token.ValueKind == JsonValueKind.String)
+                        {
+                            var tokenString = token.GetString();
+                            if (!string.IsNullOrEmpty(tokenString))
+                            {
+                                deviceTokens.Add(tokenString);
+                            }
+                        }
+                    }
+                }
+
+                if (deviceTokens.Count > 0)
+                {
+                    var notificationData = new Dictionary<string, string>
+                    {
+                        { "event_type", "user_deregistered" },
+                        { "user_id", userId }
+                    };
+
+                    await fcmService.SendMulticastAsync(
+                        deviceTokens,
+                        "Account Deregistered",
+                        "Your account has been deregistered",
+                        notificationData,
+                        cancellationToken);
+
+                    logger.LogInformation(
+                        "User deregistration notification sent to user: {userId} on {deviceCount} devices",
+                        userId,
+                        deviceTokens.Count);
+                }
+                else
+                {
+                    logger.LogInformation("User deregistered: {userId} (no active devices)", userId);
+                }
+
                 await Task.CompletedTask;
             }
             catch (Exception ex)
