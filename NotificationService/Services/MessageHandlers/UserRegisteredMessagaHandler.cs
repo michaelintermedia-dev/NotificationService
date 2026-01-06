@@ -22,7 +22,7 @@ namespace NotificationService.Services.MessageHandlers
         {
             try
             {
-                var @event = JsonSerializer.Deserialize<UserRegisteredEvent>(message);
+                var @event = JsonSerializer.Deserialize<UserRegisteredEvent>(message, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 if (@event == null)
                 {
                     _logger.LogWarning("Failed to deserialize UserRegisteredEvent");
@@ -55,7 +55,7 @@ namespace NotificationService.Services.MessageHandlers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error handling user registered event");
+                _logger.LogError(null, "Error handling user registered event");
                 throw;
             }
         }

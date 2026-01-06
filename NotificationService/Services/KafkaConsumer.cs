@@ -20,7 +20,8 @@ namespace NotificationService.Services
             var config = new ConsumerConfig
             {
                 BootstrapServers = bootstrapServers,
-                GroupId = Guid.NewGuid().ToString(), //groupId,
+                //GroupId = Guid.NewGuid().ToString(), //groupId,
+                GroupId = groupId,
                 AutoOffsetReset = AutoOffsetReset.Earliest,
                 EnableAutoCommit = true
             };

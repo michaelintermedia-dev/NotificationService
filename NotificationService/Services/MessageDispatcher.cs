@@ -41,7 +41,7 @@ namespace NotificationService.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error dispatching message from topic: {topic}", topic);
-                throw;
+                //throw;
             }
         }
     }
