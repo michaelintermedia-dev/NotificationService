@@ -1,6 +1,11 @@
+using Microsoft.Extensions.DependencyInjection;
+using NotificationService.Models;
+using NotificationService.Services.MessageHandlers;
+using System.Windows.Input;
+
 namespace NotificationService.Services
 {
-    public class Worker(ILogger<Worker> logger, IKafkaConsumer kafkaConsumer) : BackgroundService
+    public class Worker(ILogger<Worker> logger, IKafkaConsumer kafkaConsumer, TopicConfiguration topicConfiguration) : BackgroundService
     {
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -8,9 +13,8 @@ namespace NotificationService.Services
             
             try
             {
-                var topics = new[] { "user.registered", "audio.analyze.completed", "user.deregistered" };
-                
-                await Task.WhenAll(topics.Select(topic =>
+
+                await Task.WhenAll(topicConfiguration.Topics.Select(topic =>
                     Task.Run(async () =>
                     {
                         try
