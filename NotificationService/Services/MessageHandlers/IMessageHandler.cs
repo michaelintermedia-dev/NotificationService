@@ -7,6 +7,5 @@ namespace NotificationService.Services.MessageHandlers
     public interface IMessageHandler
     {
         Task HandleMessageAsync(string message, CancellationToken cancellationToken);
-        //public static string TopicName { get; }
     }
 }

@@ -18,8 +18,6 @@ namespace NotificationService.Services.MessageHandlers
             _fcmService = fcmService;
         }
 
-        //public static string TopicName => "audio.analyze.completed";
-
         public async Task HandleMessageAsync(string message, CancellationToken cancellationToken)
         {
             try

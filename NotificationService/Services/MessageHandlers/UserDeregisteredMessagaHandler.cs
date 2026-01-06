@@ -18,8 +18,6 @@ namespace NotificationService.Services.MessageHandlers
             _fcmService = fcmService;
         }
 
-        //public string TopicName => "user.deregistered";
-
         public async Task HandleMessageAsync(string message, CancellationToken cancellationToken)
         {
             try
