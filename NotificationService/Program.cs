@@ -10,6 +10,7 @@ builder.Services.AddSingleton<IKafkaConsumer, KafkaConsumer>();
 
 var messageHandlersConfig = new MessageHandlresConfig(new Dictionary<string, Type>
 {
+    { "test.topic", typeof(TestHandler) },
     { "audio.analyze.completed", typeof(AudioAnalysisCompletedMessagaHandler) },
     { "user.registered", typeof(UserRegisteredMessagaHandler) },
     { "user.deregistered", typeof(UserDeregisteredMessagaHandler) }
